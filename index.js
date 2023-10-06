@@ -49,6 +49,22 @@ async function run() {
     res.send(allToys)
   })
   
+app.get("/filter/:category",async(req,res)=>{
+  const category = req.params.category;
+  console.log(category);
+  const query = { sub_category:category };
+  const options = {}
+  const cursor = await allToysCollection.find(query, options).toArray();
+  res.send(cursor)
+})
+
+
+
+
+
+
+
+
 
 
 app.get("/search/:text",async(req,res)=>{
