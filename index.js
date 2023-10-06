@@ -27,7 +27,7 @@ async function run() {
 
 
     app.get("/",(req,res)=>{
-      res.send("server is working ")
+      res.send("server is working")
   })
   app.get("/alltoys",async(req,res)=>{
       const allToys = await allToysCollection.find().toArray()
@@ -49,6 +49,21 @@ async function run() {
     res.send(allToys)
   })
   
+
+
+app.get("/search/:text",async(req,res)=>{
+  const serchText = req.params.text;
+  const result =await allToysCollection.find({ toy_name: { $regex: serchText , $options: "i" } }).toArray()
+  res.send(result)
+})
+
+
+
+
+
+
+
+
   
   
   app.post("/addtoy",async(req,res)=>{
