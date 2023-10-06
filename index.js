@@ -22,6 +22,107 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const allToysCollection = client.db("Toys-kingDom").collection("All-toys")
+
+
+    app.get("/",(req,res)=>{
+      res.send("server is working ")
+  })
+  app.get("/alltoys",async(req,res)=>{
+      const allToys = await allToysCollection.find().toArray()
+      res.send(allToys)
+  })
+  app.get("/alltoys/:id",async(req,res)=>{
+    const id = req.params.id;
+    const find = {_id:new ObjectId(id)}
+    const result =await allToysCollection.findOne(find)
+    res.send(result)
+})
+  
+  app.get("/mytoys/:email",async(req,res)=>{
+  const getParams = req.params.email;
+  console.log(getParams);
+    const query = { user_email:getParams};
+    const options = {};
+    const allToys = await allToysCollection.find(query,options).toArray()
+    res.send(allToys)
+  })
+  
+  
+  
+  app.post("/addtoy",async(req,res)=>{
+   const toyData =req.body;
+    // console.log(toyData);
+    const result = await allToysCollection.insertOne(toyData);
+    res.send(result)
+  })
+  
+
+app.put("/edit/:id",async(req,res)=>{
+  const getId = req.params.id;
+  const getData = req.body;
+  // console.log(getId,getData);
+  const filter = { _id: new ObjectId(getId) };
+  const options = { upsert: true };
+  // toy_name,
+  // toy_img,
+  // price,
+  // sub_category,
+  // quantity,
+  // seller_name,
+  // user_email,
+  // user_img,
+  // ratting,
+  // description
+  const updateDoc = {
+    $set: {
+      toy_name:req.body.toy_name,
+      toy_img:req.body.toy_img,
+      price:req.body.price,
+      sub_category:req.body.sub_category,
+      quantity:req.body.quantity,
+      seller_name:req.body.seller_name,
+      ratting:req.body.ratting,
+      description:req.body.description
+     
+    },
+  };
+  const result = await allToysCollection.updateOne(filter, updateDoc, options);
+ res.send(result)
+
+})
+
+
+
+
+
+
+
+  app.delete("/delete/:id",async(req,res)=>{
+  const getId =req.params.id;
+  
+   const query = { _id:new ObjectId(getId) }
+  //  console.log(query);
+   const result = await allToysCollection.deleteOne(query);
+   res.send(result)
+  })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -32,7 +133,7 @@ async function run() {
 }
 
 
-const allToysCollection = client.db("Toys-kingDom").collection("All-toys")
+
 
 
 
@@ -41,41 +142,7 @@ const allToysCollection = client.db("Toys-kingDom").collection("All-toys")
 
 run().catch(console.dir);
 
-app.get("/",(req,res)=>{
-    res.send("server is working ")
-})
-app.get("/alltoys",async(req,res)=>{
-    const allToys = await allToysCollection.find().toArray()
-    res.send(allToys)
-})
 
-
-app.get("/mytoys/:email",async(req,res)=>{
-const getParams = req.params.email;
-console.log(getParams);
-  const query = { user_email:getParams};
-  const options = {};
-  const allToys = await allToysCollection.find(query,options).toArray()
-  res.send(allToys)
-})
-
-
-
-app.post("/addtoy",async(req,res)=>{
- const toyData =req.body;
-  // console.log(toyData);
-  const result = await allToysCollection.insertOne(toyData);
-  res.send(result)
-})
-
-app.delete("/delete/:id",async(req,res)=>{
-const getId =req.params.id;
-
- const query = { _id:new ObjectId(getId) }
-//  console.log(query);
- const result = await allToysCollection.deleteOne(query);
- res.send(result)
-})
 
 
 
